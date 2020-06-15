@@ -25,15 +25,41 @@
     * 5.送出請求
     ********************************************************/
 
-    //宣告一個XMLHttpRequest物件
-
-
+    //宣告一個XMLHttpRequest物件給xhr這個變數
+    let xhr = new XMLHttpRequest;
     //建立請求的各項設定及實質內容
+    // xhr.open(
+    //     Method,  方法(get拿資料  傳資料過去會用post)
+    //     URL,     api網址
+    //     async    這次的請求是要同步還是非同步(預設是非同步 true) 如果要開同步就設定false
+    // );
+
+        xhr.open(
+        'GET',
+        'https://kktix.com/events.json',     
+        true
+    );
 
 
-    //建立得到回應時的各項設定及行為
+    //建立得到回應時的各項設定及行為 >> 當xhr有接收到東西傳過來時做什麼
+    xhr.onload = function(){
+        let type = xhr.getResponseHeader("Content-Type");
+        let response = xhr.responseText;  // 回應包含很多東西 其中一個是純文字(responseText)
+        let res = JSON.parse(response); ///解析上面拿到的純文字資料
+        console.log(res);
+        document.querySelector(".title").innerHTML = res.title;
+        document.querySelector("h4").innerHTML = res.updated;
+        let events =res.entry;
+        let str = "";
+        events.forEach(function(event,index){
+            str = str + `<li>${event.title}</li>`;
+        })
+        document.querySelector('ul').innerHTML=str;
 
+    }
 
-    //送出請求
+    //送出請求 >> 別忘了送出請求,不然上面是不會有結果的!!
+
+    xhr.send();
 
     </script>

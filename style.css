@@ -30,3 +30,27 @@
     text-align: center;
     font-size:32px;
 }
+
+.title{
+    text-align: center;
+    font-weight: bolder;
+    border: 3px dashed orange;
+    box-shadow:  1px 1px 5px #ccc;
+    width: 50%;
+    padding:20px 10px;
+}
+
+h4{
+    font-size: 12px;
+    border-bottom:3px double #ccc;
+}
+
+li{
+    margin:5px 10px;
+    border:1px solid #ccc;
+    padding:5px 10px;
+}
+
+li:hover{
+    background-color: lightskyblue;
+}
