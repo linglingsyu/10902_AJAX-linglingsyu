@@ -40,22 +40,30 @@
     }
   ) */
 
-  $.ajax(
-    {
-      url: 'https://kktix.com/events.json',
-      type: 'get',
-      success: function (response) {
-        console.log(response);
-        renderList(response);
-      },
-      error: function (err) {
-        console.log("err:" + err);
-      },
-      complete: function (xhr, status) {
-        console.log("status:" + status);
-      }
-    }
-  );
+  // Ajax原生方法:
+  // $.ajax(
+  //   {
+  //     url: 'https://kktix.com/events.json',
+  //     type: 'get',
+  //     success: function (response) {
+  //       console.log(response);
+  //       renderList(response);
+  //     },
+  //     error: function (err) {
+  //       console.log("err:" + err);
+  //     },
+  //     complete: function (xhr, status) {
+  //       console.log("status:" + status);
+  //     }
+  //   }
+  // );
+
+// 精簡版
+  $.get('https://kktix.com/events.json',function(response){
+      console.log(response);
+      renderList(response);
+  })
+
 
   function renderList(response) {
     document.querySelector(".title").innerHTML = response.title;
