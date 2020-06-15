@@ -13,6 +13,7 @@
     <div class="title"></div>
     <h4></h4>
     <ul></ul>
+    <div class="footer"></div>
 
 </body>
 </html>
@@ -61,5 +62,6 @@
     //送出請求 >> 別忘了送出請求,不然上面是不會有結果的!!
 
     xhr.send();
+    document.querySelector(".footer").innerHTML = "這是頁尾"; //非同步的關係,ajax傳輸需要時間,所以這邊會先跑出來~
 
     </script>
