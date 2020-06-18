@@ -15,26 +15,9 @@
 </head>
 
 <body>
+  <!-- 新增資料用的表單 -->
   <h1 class="header">學生資料管理系統</h1>
   <button onclick="openInsert()">新增</button>
-  <div id="insertBlock" style="display: none;">
-    <h3>新增學生資料</h3>
-    <form action="api/insert.php" method="post" id="create">
-      <ul>
-        <li>姓名：<input type="text" name="name" id="name"></li>
-        <li>學號：<input type="text" name="uni_id" id="uni_id"></li>
-        <li>班級座號：<input type="text" name="class_num" id="class_num"></li>
-        <li>生日：<input type="text" name="birthday" id="birthday"></li>
-        <li>身分號字號：<input type="text" name="nat_id" id="nat_id"></li>
-        <li>住址：<input type="text" name="addr" id="addr"></li>
-        <li>父母：<input type="text" name="parent" id="parent"></li>
-        <li>電話：<input type="text" name="tel" id="tel"></li>
-        <li>科別：<input type="text" name="dept" id="dept"></li>
-        <li>畢業國中：<input type="text" name="grad_at" id="grad_at"></li>
-      </ul>
-      <div><input type="button" value="確定新增" onclick="create()"></div>
-    </form>
-  </div>
 
 
   <hr>
@@ -42,12 +25,27 @@
 
   <button></button>
   <div class="query">
+    <!-- 用來顯示班級清單的選單 -->
     <select name="" id="classes" class="classes" onchange="getStudents(this.value)"></select>
       <!-- this 為select本身 -->
       <input type="text" name="q" id="query">
       <input type="button" value="查詢" onclick="query()">
+
+
+      <!--用來存放新增表單的區塊-->
+      <div class="add_form"></div>
+
+      <!--用來存放編輯表單的區塊-->
+      <div class="edit_form"></div>
+
+        <!--用來存放學生資料的區塊-->
       <div class="students"></div>
+
+       <!--用來存放查詢結果的區塊-->
       <div class="query-result"></div>
+
+
+
   </div>
 
 </body>
@@ -65,6 +63,7 @@
 
   //新增資料的函式
   function create() {
+      //取得所有要新增到資料庫的欄位
     let name = document.querySelector('#name').value;
     let uni_id = document.querySelector('#uni_id').value;
     let class_num = document.querySelector('#class_num').value;
@@ -76,7 +75,7 @@
     let dept = document.querySelector('#dept').value;
     let grad_at = document.querySelector('#grad_at').value;
 
-    console.log(name, uni_id , class_num , birthday , nat_id , addr , parent , tel , dept , grad_at);
+    // console.log(name, uni_id , class_num , birthday , nat_id , addr , parent , tel , dept , grad_at);
 
     $.post("api/insert.php",{name, uni_id , class_num , birthday , nat_id , addr , parent , tel , dept , grad_at},function(res){
       console.log(res);
@@ -88,8 +87,12 @@
     })
 }
 
+  //新增資料的函式
 function openInsert(){
-  document.querySelector("#insertBlock").style.display ="block";
+  $.get("api/addform.php",function(form){
+    document.querySelector(".add_form").innerHTML = form;
+    document.querySelector(".edit_form").innerHTML = "";
+  })
 }
 
 
@@ -112,17 +115,89 @@ function openInsert(){
     $.get("api/query.php",{str},function(res){
       document.querySelector(".query-result").innerHTML = res;
     })
-
   }
 
   //編輯資料的函式
-  function update() {
+  function getUpdateForm(id) {
+    $.get("api/edit.php",{id},function(form){
+      document.querySelector(".edit_form").innerHTML = form;
+      document.querySelector(".add_form").innerHTML = "";
+    })
+  }
 
+  function update(){
+    let data = {};
+    //data變數宣告為一個物件 or用 new Object
+    data['name'] = document.querySelector('#name').value;
+    data['uni_id'] = document.querySelector('#uni_id').value;
+    data['class_num'] = document.querySelector('#class_num').value;
+    data['birthday'] = document.querySelector('#birthday').value;
+    data['nat_id'] = document.querySelector('#nat_id').value;
+    data['addr'] = document.querySelector('#addr').value;
+    data['parent'] = document.querySelector('#parent').value;
+    data['tel'] = document.querySelector('#tel').value;
+    data['dept'] = document.querySelector('#dept').value;
+    data['grad_at'] = document.querySelector('#grad_at').value;
+    data['id'] = document.querySelector('#id').value;
+    // console.log(data);
+    $.post("api/update.php",data,function(res){
+        if(res >= 1) {
+            alert("更新成功");
+            let nowcalss = document.querySelector("#classes").value;
+             getStudents(nowcalss);
+             document.querySelector(".edit_form").innerHTML = "";
+        }else{
+          alert("更新失敗")
+        }
+    })
   }
 
   //刪除資料的函式
-  function del() {
+  function del(id) {
+    $.post("api/del.php",{id},function(res){
+      if(res == 1){
+        alert("已成功刪除id"+id+"資料");
+        let nowcalss = document.querySelector("#classes").value;
+        getStudents(nowcalss);
+        //拿到目前班級資料,再請頁面重新載入頁面
+      }else{
+        alert("刪除失敗，請洽管理員");
+      }
+    })
+  }
 
+
+  //取消功能
+  function cancel(){
+    document.querySelector(".edit_form").innerHTML = "";
+    document.querySelector(".add_form").innerHTML = "";
+  }
+
+  //智慧查詢功能  
+
+  $("#query").on("input",()=>{ai()});
+
+
+  function ai() {
+    let str = document.querySelector("#query").value;
+    $.get("api/query.php",{str},function(res){
+      // document.querySelector(".query-result").innerHTML = res;
+      console.log(res);
+      let data = JSON.parse(res);
+      console.log(data);
+      let dom = "";
+      data.forEach(function(value,index){
+        dom = dom+`
+        <div class="list">
+        <button>${value.姓名}</button>
+        <button>${value.班級}</button>
+        <button>${value.畢業國中}</button>  
+        </div>
+        `;
+      })
+      console.log(dom);
+      document.querySelector(".query-result").innerHTML = dom;
+    })
   }
 
 </script>
